@@ -12,8 +12,8 @@ from more_itertools import ichunked
 
 @click.command(help="Automatically generate tags for a list of images.", context_settings=dict(max_content_width=140))
 @click.option("-t", "--threshold", default=0.01, type=float, show_default=True, help="The minimum tag confidence level.")
-@click.option("-n", "--limit", default=50, type=int, show_default=True, help="The maximum number of tags to return per image.")
-@click.option("-b", "--batch", "bs", default=128, type=int, show_default=True, help="The number of images to process per batch.")
+@click.option("-n", "--limit", default=100, type=int, show_default=True, help="The maximum number of tags to return per image.")
+@click.option("-b", "--batch", "bs", default=100, type=int, show_default=True, help="The number of images to process per batch.")
 @click.option("-c", "--csv", is_flag=True, help="Output CSV instead of JSON.")
 @click.option("-i", "--input-file", type=click.File(), help="Read list of image filenames from text file.")
 @click.option("-g/-f", "--group-tags/--flatten-tags", default=True, show_default=True, help="Output rows in {filename, tags} format or {filename, tag, score} format.")
@@ -46,6 +46,9 @@ def output_result(filepath, tags, csv, group_tags, name_only):
 
     if csv and group_tags:
         tag_names = " ".join(sorted(tags.keys()))
+        tag_names = tag_names.replace(" ", ", ").replace("_", " ")
+        tag_names = f'"{tag_names}"'
+        
         click.echo(f"{name},{tag_names}")
     elif csv and not group_tags:
         for tag, score in tags.items():
